@@ -602,3 +602,37 @@ func TestParseNodeLabels(t *testing.T) {
 		t.Errorf("Expected topology.kubernetes.io/zone label to have 'proxmox-node-01' as value, got %s", labels["topology.kubernetes.io/zone"])
 	}
 }
+
+func TestParseNodeTaints(t *testing.T) {
+	s := &ProxmoxScaler{
+		config: config.KproximateConfig{
+			KpNodeTaints: "node-type:worker:NoSchedule,dedicated:{{ .TargetHost }}:NoExecute",
+		},
+	}
+
+	taints, err := s.renderNodeTaints(
+		&ScaleEvent{
+			TargetHost: proxmox.HostInformation{
+				Node: "proxmox-node-01",
+			},
+		},
+	)
+
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	if len(taints) != 2 {
+		t.Errorf("Expected 2 taints, got %d", len(taints))
+	}
+
+	// Check first taint
+	if taints[0].Key != "node-type" || taints[0].Value != "worker" || taints[0].Effect != "NoSchedule" {
+		t.Errorf("Expected node-type:worker:NoSchedule, got %s:%s:%s", taints[0].Key, taints[0].Value, taints[0].Effect)
+	}
+
+	// Check second taint
+	if taints[1].Key != "dedicated" || taints[1].Value != "proxmox-node-01" || taints[1].Effect != "NoExecute" {
+		t.Errorf("Expected dedicated:proxmox-node-01:NoExecute, got %s:%s:%s", taints[1].Key, taints[1].Value, taints[1].Effect)
+	}
+}

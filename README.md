@@ -56,6 +56,10 @@ It is recommended to include either some kind of timestamp or a version in the n
 
 Nodes can labeled with dynamic values only known at provisioning time using go templating language in a configuration option. Currently this is limited to a single templatable value `TargetHost` which is the name of the proxmox host that the kproximate node will be provisioned on. More options may be added in the future as more use cases appear. See [example-values.yaml](https://github.com/jedrw/kproximate/tree/main/examples/example-values.yaml) for an example.
 
+## Node Taints
+
+Nodes can be tainted with dynamic values using the same templating system as labels. Taints are specified in the format `key:value:effect` where effect can be `NoSchedule`, `PreferNoSchedule`, or `NoExecute`. Multiple taints are separated by commas. Template values like `{{ .TargetHost }}` are supported in the value field. See [example-values-with-taints.yaml](https://github.com/jedrw/kproximate/tree/main/examples/example-values-with-taints.yaml) for an example.
+
 ## Metrics
 
 A metrics endpoint is provided at `kproximate.kproximate.cluster.svc.local/metrics` by default. The following metrics are provided in Prometheus format with CPU measured in [CPU units](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-cpu) and memory measured in bytes:

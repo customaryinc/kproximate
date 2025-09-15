@@ -245,6 +245,49 @@ func (scaler *ProxmoxScaler) renderNodeLabels(scaleEvent *ScaleEvent) (map[strin
 	return labels, nil
 }
 
+func (scaler *ProxmoxScaler) renderNodeTaints(scaleEvent *ScaleEvent) ([]apiv1.Taint, error) {
+	var taints []apiv1.Taint
+
+	for _, taint := range strings.Split(scaler.config.KpNodeTaints, ",") {
+		parts := strings.Split(taint, ":")
+		if len(parts) != 3 {
+			logger.WarnLog(fmt.Sprintf("Invalid taint format %s, expected key:value:effect", taint))
+			continue
+		}
+
+		key := parts[0]
+		value := parts[1]
+		effect := apiv1.TaintEffect(parts[2])
+
+		templateValues := struct {
+			TargetHost string
+		}{
+			TargetHost: scaleEvent.TargetHost.Node,
+		}
+
+		tmpl, err := template.New("taintValue").Parse(value)
+		if err != nil {
+			logger.WarnLog(fmt.Sprintf("Failed to parse node taint template %s, skipping taint.", taint))
+			continue
+		}
+
+		renderedValue := new(bytes.Buffer)
+		err = tmpl.Execute(renderedValue, templateValues)
+		if err != nil {
+			logger.WarnLog(fmt.Sprintf("Failed to render node taint template %s, skipping taint.", taint))
+			continue
+		}
+
+		taints = append(taints, apiv1.Taint{
+			Key:    key,
+			Value:  renderedValue.String(),
+			Effect: effect,
+		})
+	}
+
+	return taints, nil
+}
+
 func (scaler *ProxmoxScaler) ScaleUp(ctx context.Context, scaleEvent *ScaleEvent) error {
 	logger.InfoLog(fmt.Sprintf("Provisioning %s on %s", scaleEvent.NodeName, scaleEvent.TargetHost.Node))
 	pctx, cancelPCtx := context.WithTimeout(
@@ -315,6 +358,20 @@ func (scaler *ProxmoxScaler) ScaleUp(ctx context.Context, scaleEvent *ScaleEvent
 		}
 
 		logger.InfoLog(fmt.Sprintf("Set labels on %s", scaleEvent.NodeName))
+	}
+
+	if scaler.config.KpNodeTaints != "" {
+		taints, err := scaler.renderNodeTaints(scaleEvent)
+		if err != nil {
+			return err
+		}
+
+		err = scaler.Kubernetes.TaintKpNode(scaleEvent.NodeName, taints)
+		if err != nil {
+			return err
+		}
+
+		logger.InfoLog(fmt.Sprintf("Set taints on %s", scaleEvent.NodeName))
 	}
 
 	return nil

@@ -36,6 +36,11 @@ kproximate:
     ## provsioned e.g. "topology.kubernetes.io/zone={{ targetHost }}".
     kpNodeLabels: ""
 
+    ## Set taints on kp nodes. A comma separated list of taints to apply to kp-nodes in
+    ## the format "key:value:effect". Supported effects are NoSchedule, PreferNoSchedule, NoExecute.
+    ## Template values are supported similar to labels e.g. "node-type:worker-{{ .TargetHost }}:NoSchedule".
+    kpNodeTaints: ""
+
     ## The prefix to use when naming new kproximate nodes.
     kpNodeNamePrefix: kp-node
 

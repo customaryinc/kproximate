@@ -71,6 +71,10 @@ func (k *KubernetesMock) LabelKpNode(kpNodeName string, newKpNodeLabels map[stri
 	return nil
 }
 
+func (k *KubernetesMock) TaintKpNode(kpNodeName string, newKpNodeTaints []apiv1.Taint) error {
+	return nil
+}
+
 func (k *KubernetesMock) GetDriftedNodes(kpNodeNameRegex regexp.Regexp, templateNameLabelKey string, currentTemplateName string) ([]apiv1.Node, error) {
 	return []apiv1.Node{}, nil
 }

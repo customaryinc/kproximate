@@ -34,6 +34,7 @@ type Kubernetes interface {
 	GetWorkerNodesAllocatableResources() (WorkerNodesAllocatableResources, error)
 	GetKpNodes(kpNodeNameRegex regexp.Regexp) ([]apiv1.Node, error)
 	LabelKpNode(kpNodeName string, kpNodeLabels map[string]string) error
+	TaintKpNode(kpNodeName string, kpNodeTaints []apiv1.Taint) error
 	GetKpNodesAllocatedResources(kpNodeNameRegex regexp.Regexp) (map[string]AllocatedResources, error)
 	CheckForNodeJoin(ctx context.Context, newKpNodeName string)
 	DeleteKpNode(ctx context.Context, kpNodeName string) error
@@ -494,6 +495,47 @@ func (k *KubernetesClient) LabelKpNode(kpNodeName string, newKpNodeLabels map[st
 			}
 
 			kpNode.SetLabels(kpNodeLabels)
+
+			_, err = k.client.CoreV1().Nodes().Update(
+				context.TODO(),
+				kpNode,
+				metav1.UpdateOptions{},
+			)
+
+			return err
+		},
+	)
+}
+
+func (k *KubernetesClient) TaintKpNode(kpNodeName string, newKpNodeTaints []apiv1.Taint) error {
+	return retry.RetryOnConflict(
+		retry.DefaultRetry,
+		func() error {
+			kpNode, err := k.client.CoreV1().Nodes().Get(
+				context.TODO(),
+				kpNodeName,
+				metav1.GetOptions{},
+			)
+			if err != nil {
+				return err
+			}
+
+			existingTaints := kpNode.Spec.Taints
+			for _, newTaint := range newKpNodeTaints {
+				found := false
+				for i, existingTaint := range existingTaints {
+					if existingTaint.Key == newTaint.Key {
+						existingTaints[i] = newTaint
+						found = true
+						break
+					}
+				}
+				if !found {
+					existingTaints = append(existingTaints, newTaint)
+				}
+			}
+
+			kpNode.Spec.Taints = existingTaints
 
 			_, err = k.client.CoreV1().Nodes().Update(
 				context.TODO(),

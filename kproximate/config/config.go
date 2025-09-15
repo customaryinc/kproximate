@@ -14,6 +14,7 @@ type KproximateConfig struct {
 	KpNodeDisableSsh        bool   `env:"kpNodeDisableSsh"`
 	KpNodeMemory            int    `env:"kpNodeMemory"`
 	KpNodeLabels            string `env:"kpNodeLabels"`
+	KpNodeTaints            string `env:"kpNodeTaints"`
 	KpNodeNamePrefix        string `env:"kpNodeNamePrefix"`
 	KpNodeNameRegex         regexp.Regexp
 	KpNodeParams            map[string]interface{}

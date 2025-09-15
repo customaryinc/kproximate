@@ -1,6 +1,6 @@
 module github.com/jedrw/kproximate
 
-go 1.25.0
+go 1.20
 
 require (
 	github.com/Telmate/proxmox-api-go v0.0.0-20250813204706-dca727aa339f
