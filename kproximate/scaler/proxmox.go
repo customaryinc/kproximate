@@ -15,6 +15,7 @@ import (
 	"github.com/jedrw/kproximate/kubernetes"
 	"github.com/jedrw/kproximate/logger"
 	"github.com/jedrw/kproximate/proxmox"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/uuid"
 )
 

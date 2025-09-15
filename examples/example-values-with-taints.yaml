@@ -8,13 +8,14 @@ kproximate:
     kpNodeTaints: "node-type:worker:NoSchedule,dedicated:{{ .TargetHost }}:PreferNoSchedule"
     loadHeadroom: 0.2
     maxKpNodes: 4
-    pmUrl: https://<proxmox-host>:8006/api2/json
+    pmUrl: https://proxmox.example.com:8006/api2/json
     pmUserID: kproximate@pam!kproximate
 
   secrets:
-    pmToken: <proxmox-api-token>
-    sshKey: <ssh-public-key>
+    pmToken: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    sshKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ..."
 
 rabbitmq:
   auth:
-    password: <set-rabbitmq-password-here>
+    password: "changeme"
+    username: "kproximate"
