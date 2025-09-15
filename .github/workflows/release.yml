@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    
+    - name: Run tests
+      run: |
+        cd kproximate
+        go mod tidy
+        go test ./...
+    
+    - name: Build binaries
+      run: |
+        cd kproximate
+        GOOS=linux GOARCH=amd64 go build -o ../bin/kproximate-controller-linux-amd64 ./controller
+        GOOS=linux GOARCH=amd64 go build -o ../bin/kproximate-worker-linux-amd64 ./worker
+        GOOS=darwin GOARCH=amd64 go build -o ../bin/kproximate-controller-darwin-amd64 ./controller
+        GOOS=darwin GOARCH=amd64 go build -o ../bin/kproximate-worker-darwin-amd64 ./worker
+    
+    - name: Package Helm chart
+      run: |
+        helm package chart/kproximate --destination ./bin/
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          bin/*
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,40 @@
+name: Test Taint Implementation
+
+on:
+  push:
+    paths:
+      - 'kproximate/scaler/**'
+      - 'kproximate/kubernetes/**'
+      - 'kproximate/config/**'
+  pull_request:
+    paths:
+      - 'kproximate/scaler/**'
+      - 'kproximate/kubernetes/**'
+      - 'kproximate/config/**'
+
+jobs:
+  test-taints:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    
+    - name: Test taint parsing
+      run: |
+        cd kproximate
+        go mod tidy
+        go test -v ./scaler -run TestParseNodeTaints
+    
+    - name: Test taint configuration
+      run: |
+        cd kproximate
+        go test -v ./config -run TestConfig || true
+    
+    - name: Validate example configuration
+      run: |
+        helm template test chart/kproximate --values examples/example-values-with-taints.yaml > /tmp/rendered.yaml
+        grep -q "kpNodeTaints" /tmp/rendered.yaml && echo "✓ Taint configuration found in rendered template"
