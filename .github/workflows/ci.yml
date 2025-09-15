@@ -21,7 +21,7 @@ jobs:
       run: |
         cd kproximate
         go mod tidy
-        go test -v ./... || echo "Tests completed with some failures"
+        go test -v ./...
     
     - name: Build
       run: |
@@ -38,20 +38,11 @@ jobs:
       with:
         go-version: '1.23'
     
-    - name: Run go vet
-      run: |
-        cd kproximate
-        go mod tidy
-        go vet ./... || echo "go vet completed with warnings"
-    
-    - name: Run go fmt check
-      run: |
-        cd kproximate
-        if [ "$(gofmt -l . | wc -l)" -gt 0 ]; then
-          echo "Code is not formatted. Run gofmt -w ."
-          gofmt -l .
-          exit 1
-        fi
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+        working-directory: kproximate
 
   helm:
     runs-on: ubuntu-latest

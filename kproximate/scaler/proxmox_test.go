@@ -611,12 +611,6 @@ func TestParseNodeTaints(t *testing.T) {
 		},
 	}
 
-	scaleEvent := &ScaleEvent{
-		TargetHost: proxmox.HostInformation{
-			Node: "proxmox-node-01",
-		},
-	}
-
 	// Test the taint rendering logic directly
 	var taints []apiv1.Taint
 	if s.config.KpNodeTaints != "" {

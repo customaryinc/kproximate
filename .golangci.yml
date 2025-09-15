@@ -1,7 +1,6 @@
 run:
   timeout: 5m
   modules-download-mode: readonly
-  go: '1.25.0'
 
 linters-settings:
   govet:
@@ -13,18 +12,18 @@ linters-settings:
 
 linters:
   enable:
+    - govet
     - errcheck
+    - staticcheck
+    - unused
     - gosimple
     - ineffassign
     - typecheck
     - gofmt
     - goimports
     - misspell
-  disable:
-    - govet
-    - staticcheck
-    - unused
     - gocyclo
+  disable:
     - deadcode
     - varcheck
     - structcheck
@@ -33,4 +32,5 @@ issues:
   exclude-rules:
     - path: _test\.go
       linters:
+        - gocyclo
         - errcheck
