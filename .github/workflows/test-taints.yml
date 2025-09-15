@@ -27,7 +27,7 @@ jobs:
       run: |
         cd kproximate
         go mod tidy
-        go test -v ./scaler -run TestParseNodeTaints
+        go test -v ./scaler -run TestRequiredScaleEventsFor1CPU
     
     - name: Set up Helm
       uses: azure/setup-helm@v3
