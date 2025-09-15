@@ -249,16 +249,25 @@ func (scaler *ProxmoxScaler) renderNodeLabels(scaleEvent *ScaleEvent) (map[strin
 func (scaler *ProxmoxScaler) renderNodeTaints(scaleEvent *ScaleEvent) ([]apiv1.Taint, error) {
 	var taints []apiv1.Taint
 
+	if scaler.config.KpNodeTaints == "" {
+		return taints, nil
+	}
+
 	for _, taint := range strings.Split(scaler.config.KpNodeTaints, ",") {
+		taint = strings.TrimSpace(taint)
+		if taint == "" {
+			continue
+		}
+
 		parts := strings.Split(taint, ":")
 		if len(parts) != 3 {
 			logger.WarnLog(fmt.Sprintf("Invalid taint format %s, expected key:value:effect", taint))
 			continue
 		}
 
-		key := parts[0]
-		value := parts[1]
-		effect := apiv1.TaintEffect(parts[2])
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+		effect := apiv1.TaintEffect(strings.TrimSpace(parts[2]))
 
 		templateValues := struct {
 			TargetHost string
