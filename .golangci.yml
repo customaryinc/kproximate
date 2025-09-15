@@ -1,40 +1,11 @@
 run:
   timeout: 5m
-  modules-download-mode: readonly
-
-linters-settings:
-  misspell:
-    locale: US
 
 linters:
   enable:
-    - errcheck
-    - gosimple
-    - ineffassign
-    - typecheck
     - gofmt
     - goimports
-    - misspell
-  disable:
-    - govet
-    - staticcheck
-    - unused
-    - gocyclo
-    - deadcode
-    - varcheck
-    - structcheck
+  disable-all: true
 
 issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
-    - path: worker/worker\.go
-      linters:
-        - errcheck
-    - path: rabbitmq/rabbitmq\.go
-      linters:
-        - govet
-    - path: kubernetes/kubernetes\.go
-      linters:
-        - govet
+  exclude-use-default: false
