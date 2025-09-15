@@ -28,7 +28,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	kpScaler, err := scaler.NewProxmoxScaler(ctx, kpConfig)
 	if err != nil {
-		logger.FatalLog("Failed to initialise scaler", err)
+		logger.FatalLog("Failed to initialize scaler", err)
 	}
 
 	rabbitConfig, err := config.GetRabbitConfig()

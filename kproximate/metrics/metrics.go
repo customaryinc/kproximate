@@ -120,5 +120,7 @@ func Serve(
 		),
 	)
 
-	http.ListenAndServe(":80", nil)
+	if err := http.ListenAndServe(":80", nil); err != nil {
+		logger.ErrorLog("Failed to start metrics server", "error", err)
+	}
 }

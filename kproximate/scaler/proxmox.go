@@ -490,7 +490,7 @@ func (scaler *ProxmoxScaler) selectScaleDownTarget(scaleEvent *ScaleEvent) error
 	nodeLoads := make(map[string]float64)
 
 	for _, node := range kpNodes {
-		// Prioritise nodes where the template name has drifted
+		// Prioritize nodes where the template name has drifted
 		templateName := node.GetLabels()[templateNameLabelKey]
 		if templateName != scaler.config.KpNodeTemplateName {
 			scaleEvent.NodeName = node.Name
